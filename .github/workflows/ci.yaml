@@ -49,7 +49,7 @@ jobs:
       run: |
         cd gitops-repo
 
-        sed -i "s|image:.*|image: 501673236830.dkr.ecr.us-west-2.amazonaws.com/demo-private/ui:${{ github.sha }}|g" k8s/rollout.yaml
+        sed -i "s|image:.*|image: 501673236830.dkr.ecr.us-west-2.amazonaws.com/demo-private/ui:${{ github.sha }}|g" rollout.yaml
 
     - name: Commit & Push to GitOps repo
       run: |
