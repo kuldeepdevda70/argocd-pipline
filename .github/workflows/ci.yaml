@@ -43,7 +43,7 @@ jobs:
     # =========================
     - name: Clone GitOps repo
       run: |
-        git clone https://x-access-token:${{ secrets.GITOPS_TOKEN }}@github.com/kuldeepdevda70/gitops-repo.git
+        git clone https://x-access-token:${{ secrets.GITOPS_TOKEN }}@github.com/kuldeepdevda70/gitops.git
 
     - name: Update rollout.yaml with new image
       run: |
