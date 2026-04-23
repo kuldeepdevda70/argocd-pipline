@@ -1,4 +1,4 @@
-name: Build & Push to ECR
+name: Build & Push to ECR + Update GitOps Repo
 
 on:
   push:
@@ -9,13 +9,16 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
+    - name: Checkout application code
       uses: actions/checkout@v3
 
+    # =========================
+    # AWS LOGIN
+    # =========================
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v2
       with:
-        aws-access-key-id: ${{secrets.AWS_ACCESS_KEY_ID}}
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: us-west-2
 
@@ -23,11 +26,38 @@ jobs:
       run: |
         aws ecr get-login-password --region us-west-2 | docker login --username AWS --password-stdin 501673236830.dkr.ecr.us-west-2.amazonaws.com
 
+    # =========================
+    # BUILD + PUSH IMAGE
+    # =========================
     - name: Build Docker image
-      run: docker build -t demo-private/ui .
+      run: docker build -t demo-private/ui:${{ github.sha }} .
 
-    - name: Tag image
-      run: docker tag demo-private/ui:latest 501673236830.dkr.ecr.us-west-2.amazonaws.com/demo-private/ui:${{ github.sha }}
+    - name: Tag Docker image
+      run: docker tag demo-private/ui:${{ github.sha }} 501673236830.dkr.ecr.us-west-2.amazonaws.com/demo-private/ui:${{ github.sha }}
 
-    - name: Push image
+    - name: Push Docker image
       run: docker push 501673236830.dkr.ecr.us-west-2.amazonaws.com/demo-private/ui:${{ github.sha }}
+
+    # =========================
+    # UPDATE GITOPS REPO
+    # =========================
+    - name: Clone GitOps repo
+      run: |
+        git clone https://x-access-token:${{ secrets.GITOPS_TOKEN }}@github.com/kuldeepdevda70/gitops-repo.git
+
+    - name: Update rollout.yaml with new image
+      run: |
+        cd gitops-repo
+
+        sed -i "s|image:.*|image: 501673236830.dkr.ecr.us-west-2.amazonaws.com/demo-private/ui:${{ github.sha }}|g" k8s/rollout.yaml
+
+    - name: Commit & Push to GitOps repo
+      run: |
+        cd gitops-repo
+
+        git config user.name "github-actions"
+        git config user.email "github-actions@github.com"
+
+        git add .
+        git commit -m "update image to ${{ github.sha }}"
+        git push
