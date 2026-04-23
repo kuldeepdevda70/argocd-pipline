@@ -1,0 +1,33 @@
+name: Build & Push to ECR
+
+on:
+  push:
+    branches: ["main"]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v2
+      with:
+        aws-access-key-id: ${{secrets.AWS_ACCESS_KEY_ID}}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: us-west-2
+
+    - name: Login to Amazon ECR
+      run: |
+        aws ecr get-login-password --region us-west-2 | docker login --username AWS --password-stdin 501673236830.dkr.ecr.us-west-2.amazonaws.com
+
+    - name: Build Docker image
+      run: docker build -t demo-private/ui .
+
+    - name: Tag image
+      run: docker tag demo-private/ui:latest 501673236830.dkr.ecr.us-west-2.amazonaws.com/demo-private/ui:${{ github.sha }}
+
+    - name: Push image
+      run: docker push 501673236830.dkr.ecr.us-west-2.amazonaws.com/demo-private/ui:${{ github.sha }}
