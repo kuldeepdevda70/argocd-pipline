@@ -1,5 +1,5 @@
 body {
-    background-color: #052205; /* new background color */
+    background-color: #e59812; /* new background color */
     color: #e6b0b0;
 }
 
@@ -9,7 +9,7 @@ body {
     padding: 20px 20px 10px 20px;
     width: 600px;
     margin: 30px auto;
-    border: 1px solid #db1414;
+    border: 1px solid #433a3a;
     border-radius: 2px;
     position: relative;
 }
@@ -35,7 +35,7 @@ body {
 }
 
 li.ui-state-default {
-    background: #2a7a37;
+    background: #e6bec9;
     border: none;
     border-bottom: 1px solid #090707;
 }
@@ -121,7 +121,7 @@ footer .buttons {
     margin: 10px 0;
     padding: 10px;
     border-radius: 0;
-    background: #7c0f0f;
+    background: #d60a58;
     border: 1px solid rgba(229, 229, 229, 0.5);
-    color: #ddc8c8;
+    color: #a68b8b;
 }
